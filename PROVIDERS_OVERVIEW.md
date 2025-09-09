@@ -1,5 +1,7 @@
 # Currency Providers Overview
 
+Complete guide to supported exchange rate providers in @wickedlet/currency-converter v1.0.0
+
 ## Available Providers
 
 ### 1. 💰 **Open Exchange Rates**

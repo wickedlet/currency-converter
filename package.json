@@ -1,6 +1,6 @@
 {
   "name": "@wickedlet/currency-converter",
-  "version": "1.3.0",
+  "version": "1.0.0",
   "description": "A flexible currency converter with multiple providers and Redis caching",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

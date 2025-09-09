@@ -171,7 +171,7 @@ console.log(usdToEur); // 0.8523
 ### Advanced Cache Management
 
 ```typescript
-// =================== NEW CACHING FEATURES ===================
+// =================== ADVANCED CACHING FEATURES ===================
 
 // Get comprehensive cache statistics
 const stats = await converter.getCacheStats();
@@ -202,21 +202,21 @@ await converter.clearProviderCache();
 // Clear ALL exchange rates cache (all providers, all currencies)
 await converter.clearAllRatesCache();
 
-// =================== LEGACY CACHE METHODS ===================
-// These still work for backward compatibility but use the old caching system
+// =================== BASIC CACHE METHODS ===================
+// Simple cache management methods
 
-// Check if conversion results are cached (legacy)
+// Check if conversion results are cached
 const isCached = await converter.isCached('USD');
 console.log(isCached);
 
-// Get cache TTL for conversion results (legacy)
+// Get cache TTL for conversion results
 const ttl = await converter.getCacheTTL('USD');
-console.log(`Legacy cache expires in ${ttl} seconds`);
+console.log(`Cache expires in ${ttl} seconds`);
 
-// Clear legacy cache for specific currency
+// Clear cache for specific currency
 await converter.clearCache('USD');
 
-// Clear all legacy cache
+// Clear all basic cache
 await converter.clearCache();
 ```
 
@@ -384,7 +384,7 @@ Common error scenarios:
 - `setProvider(provider: ICurrencyProvider): void`
 - `getProviderName(): string`
 
-#### Advanced Cache Management (NEW in v1.3.0)
+#### Advanced Cache Management
 
 - `getCacheStats(): Promise<CacheStatistics>` - Get comprehensive cache statistics
 - `isProviderRatesCached(baseCurrency: string): Promise<boolean>` - Check if provider rates are cached
@@ -393,11 +393,11 @@ Common error scenarios:
 - `clearProviderCache(): Promise<void>` - Clear all cached rates for current provider
 - `clearAllRatesCache(): Promise<void>` - Clear ALL exchange rates cache
 
-#### Legacy Cache Methods (Backward Compatibility)
+#### Basic Cache Methods
 
-- `clearCache(baseCurrency?: string): Promise<void>` - Clear legacy cache
-- `isCached(baseCurrency: string): Promise<boolean>` - Check legacy cache
-- `getCacheTTL(baseCurrency: string): Promise<number>` - Get legacy cache TTL
+- `clearCache(baseCurrency?: string): Promise<void>` - Clear basic cache
+- `isCached(baseCurrency: string): Promise<boolean>` - Check basic cache status
+- `getCacheTTL(baseCurrency: string): Promise<number>` - Get basic cache TTL
 
 ## License
 
