@@ -9,7 +9,6 @@ A flexible currency converter package for Node.js with TypeScript support, multi
 - 🎯 **TypeScript**: Full TypeScript support with comprehensive type definitions
 - 🛡️ **Error Handling**: Robust error handling and retry logic
 - 📊 **Multiple Conversions**: Batch conversion support
-- 🔍 **Historical Rates**: Support for historical exchange rates (provider dependent)
 - 💰 **Cost Optimization**: Massive API call reduction (~99% fewer calls)
 - 📈 **Cache Management**: Rich cache statistics and manual refresh capabilities
 
@@ -220,17 +219,7 @@ await converter.clearCache('USD');
 await converter.clearCache();
 ```
 
-### Historical Rates (Provider Dependent)
 
-```typescript
-// Fixer.io historical rates
-const fixerProvider = new FixerProvider({
-  apiKey: 'your-api-key',
-});
-
-const historicalRates = await fixerProvider.getHistoricalRates('2024-01-01', 'USD');
-console.log(historicalRates);
-```
 
 ### Custom Provider
 

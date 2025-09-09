@@ -98,68 +98,6 @@ export class OpenExchangeRatesProvider extends BaseCurrencyProvider {
   }
 
   /**
-   * Get historical exchange rates for a specific date
-   * Note: Historical data requires paid plan
-   */
-  public async getHistoricalRates(date: string, baseCurrency: string = 'USD'): Promise<ExchangeRateResponse> {
-    try {
-      const config = this.config as OpenExchangeRatesConfig;
-      
-      if (config.plan === 'free') {
-        throw new Error('Historical rates require a paid plan');
-      }
-
-      if (!this.validateCurrencyCode(baseCurrency)) {
-        throw new Error(`Invalid base currency code: ${baseCurrency}`);
-      }
-
-      // Validate date format (YYYY-MM-DD)
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        throw new Error('Date must be in YYYY-MM-DD format');
-      }
-
-      const normalizedBase = this.normalizeCurrencyCode(baseCurrency);
-      
-      const requestConfig = {
-        method: 'GET' as const,
-        url: `/historical/${date}.json`,
-        params: {
-          app_id: config.apiKey,
-          base: normalizedBase,
-        },
-      };
-
-      const data = await this.makeRequest(requestConfig);
-
-      if (data.error) {
-        return this.formatResponse(
-          false,
-          normalizedBase,
-          null,
-          data.description || 'Failed to fetch historical rates from Open Exchange Rates'
-        );
-      }
-
-      const rates = data.rates || {};
-      rates[normalizedBase] = 1;
-
-      return {
-        success: true,
-        base: normalizedBase,
-        date: new Date(data.timestamp * 1000).toISOString().split('T')[0],
-        rates,
-      };
-    } catch (error: any) {
-      return this.formatResponse(
-        false,
-        this.normalizeCurrencyCode(baseCurrency),
-        null,
-        `Open Exchange Rates historical API error: ${error.message}`
-      );
-    }
-  }
-
-  /**
    * Get time-series data (Enterprise plan only)
    */
   public async getTimeSeries(

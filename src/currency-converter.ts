@@ -86,11 +86,9 @@ export class CurrencyConverter {
         }
       }
 
-      console.log('rates', rates);
       // If no cached rates, fetch from provider
       if (!rates) {
         const response = await this.provider.getExchangeRates(fromCurrency);
-        console.log('response', response);
         if (!response.success) {
           throw new Error(response.error || 'Failed to fetch exchange rates');
         }
