@@ -35,7 +35,7 @@ export abstract class BaseCurrencyProvider implements ICurrencyProvider {
   }
 
   protected getBaseUrl(): string {
-    return this.baseUrl;
+    return this.config.baseUrl || this.baseUrl;
   }
 
   public abstract isConfigValid(): boolean;
@@ -44,11 +44,19 @@ export abstract class BaseCurrencyProvider implements ICurrencyProvider {
     try {
       // Build full URL manually to avoid axios baseURL issues
       const fullUrl = `${this.getBaseUrl()}${config.url}`;
+      
+      // Merge default parameters with request parameters
+      const mergedParams = {
+        ...this.config.defaultParams,
+        ...config.params
+      };
+      
       // Create new config without baseURL dependency
       const requestConfig = {
         ...config,
         url: fullUrl,
-        method: config.method || 'GET'
+        method: config.method || 'GET',
+        params: mergedParams
       };
       
       // Use axios directly instead of instance to avoid baseURL combination

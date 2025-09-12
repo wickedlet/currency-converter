@@ -3,7 +3,7 @@ import { ExchangeRateResponse, ProviderConfig } from '../types';
 
 export interface FixerConfig extends ProviderConfig {
   apiKey: string;
-  useHttps?: boolean;
+  useHttps?: boolean; // Deprecated: use baseUrl instead
 }
 
 export class FixerProvider extends BaseCurrencyProvider {
@@ -14,15 +14,15 @@ export class FixerProvider extends BaseCurrencyProvider {
   private readonly httpsBaseUrl = 'https://api.fixer.io';
 
   constructor(config: FixerConfig) {
+    // Handle legacy useHttps option by setting baseUrl if not already provided
+    if (config.useHttps && !config.baseUrl) {
+      config.baseUrl = 'https://api.fixer.io';
+    }
+    
     super(config);
     
     if (!this.isConfigValid()) {
       throw new Error('Fixer API key is required');
-    }
-
-    // Use HTTPS URL if specified in config
-    if (config.useHttps) {
-      this.httpClient.defaults.baseURL = this.httpsBaseUrl;
     }
   }
 

@@ -11,6 +11,9 @@ A flexible currency converter package for Node.js with TypeScript support, multi
 - 📊 **Multiple Conversions**: Batch conversion support
 - 💰 **Cost Optimization**: Massive API call reduction (~99% fewer calls)
 - 📈 **Cache Management**: Rich cache statistics and manual refresh capabilities
+- 🔧 **Custom Configuration**: Custom base URLs and default parameters for all providers
+- 🌐 **Proxy Support**: Easy integration with proxy servers and custom endpoints
+- 🔗 **Backward Compatibility**: Legacy configuration options still supported
 
 ## Installation
 
@@ -113,8 +116,18 @@ const provider = new FixerProvider({
   timeout: 5000,
   retries: 3,
 });
-```
 
+// With custom base URL and default parameters
+const customProvider = new FixerProvider({
+  apiKey: 'your-fixer-api-key',
+  baseUrl: 'https://custom-fixer-proxy.example.com/api',
+  defaultParams: {
+    precision: 6,
+    show_alternative: true,
+  },
+  timeout: 10000,
+});
+```
 
 ### Open Exchange Rates Provider
 
@@ -124,6 +137,18 @@ import { OpenExchangeRatesProvider } from '@wickedlet/currency-converter';
 const openExchangeProvider = new OpenExchangeRatesProvider({
   apiKey: 'your-openexchangerates-api-key',
   plan: 'free', // 'free', 'developer', 'enterprise'
+});
+
+// With custom configuration
+const customOpenExchangeProvider = new OpenExchangeRatesProvider({
+  apiKey: 'your-openexchangerates-api-key',
+  baseUrl: 'https://custom-oxr-proxy.example.com/v6',
+  plan: 'developer',
+  defaultParams: {
+    show_alternative: true,
+    prettyprint: 1,
+  },
+  timeout: 8000,
 });
 ```
 
@@ -136,8 +161,163 @@ const currencyLayerProvider = new CurrencyLayerProvider({
   apiKey: 'your-currencylayer-api-key',
   useHttps: true, // Requires paid plan
 });
+
+// With custom base URL and default parameters
+const customCurrencyLayerProvider = new CurrencyLayerProvider({
+  apiKey: 'your-currencylayer-api-key',
+  baseUrl: 'https://custom-currencylayer-proxy.example.com/api',
+  defaultParams: {
+    format: 1,
+    precision: 6,
+    source: 'USD',
+  },
+  timeout: 15000,
+  retries: 5,
+});
 ```
 
+
+## Custom Configuration
+
+### Custom Base URL
+
+You can specify a custom base URL for any provider, useful for proxy servers or custom endpoints:
+
+```typescript
+import { CurrencyLayerProvider } from '@wickedlet/currency-converter';
+
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-api-key',
+  baseUrl: 'https://your-proxy-server.com/api', // Custom base URL
+});
+```
+
+### Default Parameters
+
+Add default parameters that will be included in every API request:
+
+```typescript
+import { CurrencyLayerProvider } from '@wickedlet/currency-converter';
+
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-api-key',
+  defaultParams: {
+    format: 1,        // Response format
+    precision: 6,     // Decimal precision
+    source: 'USD',    // Default source currency
+  },
+});
+
+// These parameters will be automatically added to every request
+```
+
+### Legacy HTTPS Support
+
+For backward compatibility, `useHttps` option is still supported:
+
+```typescript
+// Legacy way (still works)
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-api-key',
+  useHttps: true, // Automatically sets baseUrl to HTTPS version
+});
+
+// Modern way (recommended)
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-api-key',
+  baseUrl: 'https://apilayer.net/api', // Explicit HTTPS URL
+});
+```
+
+### Complete Custom Configuration Example
+
+```typescript
+import { CurrencyLayerProvider, CurrencyConverter } from '@wickedlet/currency-converter';
+import { createClient } from 'redis';
+
+// Setup Redis
+const redisClient = createClient();
+await redisClient.connect();
+
+// Create provider with all custom options
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-currencylayer-api-key',
+  baseUrl: 'https://custom-api-proxy.example.com/currencylayer',
+  defaultParams: {
+    format: 1,
+    precision: 8,
+    source: 'USD',
+  },
+  timeout: 15000,  // 15 seconds timeout
+  retries: 5,      // 5 retry attempts
+});
+
+// Create converter with caching
+const converter = new CurrencyConverter({
+  provider,
+  cache: {
+    client: redisClient,
+    config: {
+      ttl: 7200, // 2 hours cache
+      keyPrefix: 'my_app_rates',
+    },
+  },
+});
+
+// Use the converter
+const result = await converter.convertCurrency(100, 'USD', 'EUR');
+console.log(result);
+```
+
+### Use Cases for Custom Configuration
+
+#### 1. Corporate Proxy Servers
+```typescript
+// Route requests through corporate proxy
+const provider = new FixerProvider({
+  apiKey: 'your-api-key',
+  baseUrl: 'https://proxy.company.com/fixer-api',
+});
+```
+
+#### 2. API Gateway Integration
+```typescript
+// Use your API gateway that adds authentication/logging
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-api-key',
+  baseUrl: 'https://api-gateway.example.com/currency',
+  defaultParams: {
+    client_id: 'your-app-id',
+    format: 1,
+  },
+});
+```
+
+#### 3. Development/Testing with Mock APIs
+```typescript
+// Point to local mock server during development
+const provider = new OpenExchangeRatesProvider({
+  apiKey: 'test-key',
+  baseUrl: 'http://localhost:3001/mock-api',
+  defaultParams: {
+    prettyprint: 1,
+  },
+});
+```
+
+#### 4. Custom API Wrappers
+```typescript
+// Use your own API wrapper that aggregates multiple providers
+const provider = new CurrencyLayerProvider({
+  apiKey: 'your-wrapper-key',
+  baseUrl: 'https://your-currency-api.com/v1',
+  defaultParams: {
+    aggregator: 'weighted_average',
+    precision: 8,
+  },
+  timeout: 20000, // Longer timeout for complex operations
+});
+```
 
 ## Advanced Usage
 
@@ -309,9 +489,10 @@ Redis Key Structure:
 ```typescript
 interface ProviderConfig {
   apiKey?: string;
-  baseUrl?: string;
+  baseUrl?: string; // Custom base URL for API endpoints
   timeout?: number; // Request timeout in milliseconds
   retries?: number; // Number of retry attempts
+  defaultParams?: Record<string, any>; // Default parameters added to all requests
 }
 ```
 

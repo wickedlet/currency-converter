@@ -15,6 +15,7 @@ export interface ProviderConfig {
   baseUrl?: string;
   timeout?: number;
   retries?: number;
+  defaultParams?: Record<string, any>;
   [key: string]: any;
 }
 

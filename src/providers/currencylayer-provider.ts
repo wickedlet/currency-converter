@@ -3,7 +3,7 @@ import { ExchangeRateResponse, ProviderConfig } from '../types';
 
 export interface CurrencyLayerConfig extends ProviderConfig {
   apiKey: string;
-  useHttps?: boolean; // Requires paid plan
+  useHttps?: boolean; // Requires paid plan (deprecated: use baseUrl instead)
 }
 
 export class CurrencyLayerProvider extends BaseCurrencyProvider {
@@ -14,15 +14,15 @@ export class CurrencyLayerProvider extends BaseCurrencyProvider {
   private readonly httpsBaseUrl = 'https://apilayer.net/api';
 
   constructor(config: CurrencyLayerConfig) {
+    // Handle legacy useHttps option by setting baseUrl if not already provided
+    if (config.useHttps && !config.baseUrl) {
+      config.baseUrl = 'https://apilayer.net/api';
+    }
+    
     super(config);
     
     if (!this.isConfigValid()) {
       throw new Error('CurrencyLayer API key is required');
-    }
-
-    // Use HTTPS URL if specified in config
-    if (config.useHttps) {
-      this.httpClient.defaults.baseURL = this.httpsBaseUrl;
     }
   }
 
